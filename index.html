@@ -3,725 +3,1354 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StellarMind AI - Space Exploration Specialist Assistant</title>
+    <title>StellarMind AI - Space Beacon Guidance System</title>
     <style>
         :root {
-            --primary: #0b3d91;
-            --secondary: #fc3d21;
-            --dark: #1a1a2e;
-            --light: #e6f7ff;
-            --accent: #4df0ff;
+            --space-blue: #0b0b2b;
+            --nebula-purple: #4b0082;
+            --star-yellow: #ffcc00;
+            --warning-red: #ff4444;
+            --critical-orange: #ff8800;
+            --comms-green: #00ffaa;
         }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Courier New', monospace;
+            background-color: var(--space-blue);
+            color: white;
             margin: 0;
             padding: 0;
-            background-color: var(--dark);
-            color: var(--light);
-            background-image: radial-gradient(circle at 10% 20%, rgba(11, 61, 145, 0.2) 0%, transparent 20%), 
-                              radial-gradient(circle at 90% 80%, rgba(252, 61, 33, 0.2) 0%, transparent 20%);
-            min-height: 100vh;
-            transition: background 0.5s;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(75, 0, 130, 0.2) 0%, transparent 25%),
+                radial-gradient(circle at 80% 70%, rgba(255, 204, 0, 0.1) 0%, transparent 25%);
+            overflow: hidden;
         }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+        
+        .app-container {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background-color: rgba(11, 11, 43, 0.9);
+            padding: 15px;
+            border-right: 1px solid var(--comms-green);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .tab-bar {
+            display: flex;
+            background-color: rgba(11, 11, 43, 0.9);
+            border-bottom: 1px solid var(--comms-green);
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+        
+        .tab:hover {
+            background-color: rgba(75, 0, 130, 0.3);
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--comms-green);
+            background-color: rgba(75, 0, 130, 0.5);
+        }
+        
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
             padding: 20px;
+            display: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="20" cy="20" r="0.5" fill="%23ffcc00" opacity="0.7"/><circle cx="50" cy="30" r="0.5" fill="%23ffcc00" opacity="0.5"/><circle cx="80" cy="10" r="0.5" fill="%23ffcc00" opacity="0.9"/><circle cx="10" cy="70" r="0.5" fill="%23ffcc00" opacity="0.6"/><circle cx="90" cy="80" r="0.5" fill="%23ffcc00" opacity="0.8"/></svg>');
+            background-size: 200px 200px;
         }
-        header {
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .status-bar {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 8px 15px;
+            font-size: 0.9em;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            border-bottom: 1px solid rgba(230, 247, 255, 0.1);
+            border-top: 1px solid var(--comms-green);
         }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        
+        .memory-indicator {
+            color: var(--comms-green);
         }
-        .logo h1 {
-            margin: 0;
-            font-size: 28px;
-            background: linear-gradient(90deg, var(--accent), var(--light));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+        
+        .sensor-panel {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
         }
-        .logo img {
-            height: 40px;
+        
+        .sensor-card {
+            background-color: rgba(75, 0, 130, 0.3);
+            padding: 12px;
+            border-radius: 5px;
+            border-left: 3px solid var(--comms-green);
         }
-        .stats-panel {
-            background: rgba(11, 61, 145, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-            border: 1px solid var(--primary);
+        
+        .sensor-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--comms-green);
         }
-        .stats-grid {
+        
+        .sensor-unit {
+            font-size: 0.8em;
+            color: #aaa;
+        }
+        
+        .sensor-status {
+            font-size: 0.75em;
+            margin-top: 5px;
+            padding: 2px 5px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+        
+        .status-normal {
+            background-color: rgba(0, 255, 170, 0.1);
+            color: var(--comms-green);
+        }
+        
+        .status-warning {
+            background-color: rgba(255, 100, 0, 0.2);
+            color: var(--warning-red);
+        }
+        
+        .status-critical {
+            background-color: rgba(255, 0, 0, 0.2);
+            color: var(--critical-orange);
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .control-panel {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
+            gap: 10px;
+            margin: 15px 0;
         }
-        .stat-card {
-            background: rgba(26, 26, 46, 0.7);
-            border-radius: 8px;
-            padding: 15px;
-            border-left: 4px solid var(--accent);
-        }
-        .stat-card h3 {
-            margin-top: 0;
-            color: var(--accent);
-            font-size: 14px;
-            text-transform: uppercase;
-        }
-        .stat-card .value {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .stat-card .description {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-        .chat-container {
-            display: flex;
-            margin-top: 30px;
-            gap: 20px;
-        }
-        .sidebar {
-            width: 250px;
-            background: rgba(26, 26, 46, 0.7);
-            border-radius: 10px;
-            padding: 20px;
-            border: 1px solid rgba(230, 247, 255, 0.1);
-        }
-        .sidebar-section {
-            margin-bottom: 25px;
-        }
-        .sidebar-section h3 {
-            color: var(--accent);
-            margin-top: 0;
-            font-size: 16px;
-            border-bottom: 1px solid rgba(230, 247, 255, 0.1);
-            padding-bottom: 8px;
-        }
-        .mode-selector {
+        
+        .control-btn {
+            background-color: rgba(75, 0, 130, 0.5);
+            color: white;
+            border: 1px solid var(--comms-green);
+            border-radius: 5px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            align-items: center;
         }
-        .mode-btn {
-            background: rgba(11, 61, 145, 0.3);
-            border: none;
-            color: var(--light);
+        
+        .control-btn:hover {
+            background-color: rgba(75, 0, 130, 0.7);
+        }
+        
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .control-btn.warning {
+            border-color: var(--warning-red);
+        }
+        
+        .control-btn.critical {
+            border-color: var(--critical-orange);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .data-section {
+            margin-bottom: 20px;
+        }
+        
+        .flashcard {
+            background-color: rgba(75, 0, 130, 0.3);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border-left: 5px solid var(--comms-green);
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .flashcard h3 {
+            margin-top: 0;
+            color: var(--comms-green);
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+        
+        .data-table th, .data-table td {
+            border: 1px solid var(--comms-green);
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .data-table th {
+            background-color: rgba(75, 0, 130, 0.5);
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: rgba(75, 0, 130, 0.2);
+        }
+        
+        .progress-container {
+            margin: 15px 0;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: rgba(0, 255, 170, 0.3);
+            border-radius: 4px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--comms-green);
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .tool-output {
+            background-color: rgba(75, 0, 130, 0.5);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border: 1px solid var(--star-yellow);
+        }
+        
+        .feature-btn {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            text-align: left;
+            background-color: rgba(75, 0, 130, 0.5);
+            color: white;
+        }
+        
+        .feature-btn:hover {
+            background-color: rgba(75, 0, 130, 0.7);
+        }
+        
+        .performance-stats {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            background-color: rgba(0, 0, 0, 0.8);
             padding: 10px;
             border-radius: 5px;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.3s;
+            font-size: 0.8em;
+            border: 1px solid var(--comms-green);
+            z-index: 100;
         }
-        .mode-btn:hover {
-            background: rgba(11, 61, 145, 0.5);
+        
+        .screenshot-upload {
+            display: none;
         }
-        .mode-btn.active {
-            background: var(--primary);
-            font-weight: bold;
+        
+        .section-title {
+            color: var(--comms-green);
+            border-bottom: 1px solid var(--comms-green);
+            padding-bottom: 5px;
+            margin-top: 20px;
+            margin-bottom: 15px;
         }
-        .slider-container {
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
             margin-top: 15px;
         }
-        .slider-container label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-        .slider {
-            width: 100%;
-            height: 8px;
-            -webkit-appearance: none;
-            background: rgba(230, 247, 255, 0.1);
-            outline: none;
-            border-radius: 4px;
-        }
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: var(--accent);
+        
+        .nav-btn {
+            padding: 8px 15px;
+            background-color: rgba(75, 0, 130, 0.5);
+            border: 1px solid var(--comms-green);
+            color: white;
+            border-radius: 5px;
             cursor: pointer;
         }
-        .chat-area {
-            flex: 1;
+        
+        .nav-btn:hover {
+            background-color: rgba(75, 0, 130, 0.7);
+        }
+        
+        .chat-container {
             display: flex;
             flex-direction: column;
+            height: 100%;
         }
+        
         .chat-messages {
             flex: 1;
-            background: rgba(26, 26, 46, 0.7);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(230, 247, 255, 0.1);
             overflow-y: auto;
-            max-height: 60vh;
+            padding: 10px;
         }
+        
         .message {
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(230, 247, 255, 0.05);
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 5px;
+            max-width: 80%;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
         }
-        .message:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .message-user {
-            color: var(--accent);
-            font-weight: bold;
+        
+        .user-message {
+            background-color: rgba(75, 0, 130, 0.5);
+            margin-left: auto;
+            border: 1px solid var(--comms-green);
+        }
+        
+        .bot-message {
+            background-color: rgba(75, 0, 130, 0.3);
+            margin-right: auto;
+            border: 1px solid var(--star-yellow);
+        }
+        
+        .system-message {
+            background-color: rgba(75, 0, 130, 0.7);
+            margin: 10px auto;
+            border: 1px solid var(--star-yellow);
+            text-align: center;
+            max-width: 90%;
+        }
+        
+        .timestamp {
+            font-size: 0.75em;
+            color: #aaa;
             margin-bottom: 5px;
         }
-        .message-ai {
-            color: var(--light);
-        }
-        .message-ai.persona {
-            font-style: italic;
-            border-left: 3px solid var(--secondary);
-            padding-left: 10px;
-        }
+        
         .input-area {
             display: flex;
             flex-direction: column;
             gap: 15px;
+            padding: 15px;
+            background-color: rgba(11, 11, 43, 0.9);
+            border-top: 1px solid var(--comms-green);
         }
+        
         .input-row {
             display: flex;
             gap: 10px;
         }
+        
         .text-input {
             flex: 1;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid rgba(230, 247, 255, 0.2);
-            background: rgba(26, 26, 46, 0.7);
-            color: var(--light);
-            font-size: 16px;
-            min-height: 60px;
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid var(--comms-green);
+            background-color: rgba(75, 0, 130, 0.3);
+            color: white;
+            font-family: inherit;
             resize: none;
+            min-height: 60px;
         }
+        
         .text-input:focus {
             outline: none;
-            border-color: var(--accent);
+            border-color: var(--star-yellow);
         }
-        .file-upload {
-            display: none;
-        }
-        .upload-btn {
-            background: rgba(11, 61, 145, 0.3);
-            color: var(--light);
+        
+        .send-btn {
+            background-color: var(--comms-green);
+            color: var(--space-blue);
             border: none;
-            padding: 10px 15px;
+            padding: 12px 20px;
             border-radius: 5px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-        .upload-btn:hover {
-            background: rgba(11, 61, 145, 0.5);
-        }
-        .send-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 8px;
-            cursor: pointer;
             font-weight: bold;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
+        
         .send-btn:hover {
-            background: var(--secondary);
+            background-color: var(--star-yellow);
         }
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        .feature-card {
-            background: rgba(26, 26, 46, 0.7);
-            border-radius: 10px;
-            padding: 20px;
-            border: 1px solid rgba(230, 247, 255, 0.1);
-            transition: all 0.3s;
-        }
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-        }
-        .feature-card h3 {
-            color: var(--accent);
-            margin-top: 0;
-        }
-        .feature-card p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        .theme-selector {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-        .theme-btn {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 2px solid transparent;
+        
+        .upload-btn {
+            background-color: rgba(75, 0, 130, 0.5);
+            color: white;
+            border: 1px solid var(--comms-green);
+            border-radius: 5px;
+            padding: 0 15px;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-        .theme-btn:hover {
-            transform: scale(1.1);
-        }
-        .theme-btn.active {
-            border-color: var(--light);
-        }
-        .theme-1 { background: linear-gradient(135deg, #0b3d91, #1a1a2e); }
-        .theme-2 { background: linear-gradient(135deg, #4b0082, #000000); }
-        .theme-3 { background: linear-gradient(135deg, #006400, #000000); }
-        .theme-4 { background: linear-gradient(135deg, #8b0000, #000000); }
-        .theme-5 { background: linear-gradient(135deg, #ff8c00, #000000); }
-        .theme-6 { background: linear-gradient(135deg, #9400d3, #000000); }
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(26, 26, 46, 0.85);
-            z-index: 1000;
-            justify-content: center;
+            display: flex;
             align-items: center;
         }
-        .overlay.active {
-            display: flex;
+        
+        .upload-btn:hover {
+            background-color: rgba(75, 0, 130, 0.7);
         }
-        .overlay-content {
-            background: #23234a;
-            color: var(--light);
-            padding: 32px 32px 24px 32px;
-            border-radius: 12px;
-            min-width: 320px;
-            max-width: 90vw;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.35);
-            position: relative;
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
         }
-        .close-overlay {
-            position: absolute;
-            top: 10px;
-            right: 18px;
-            background: none;
-            border: none;
-            color: var(--accent);
-            font-size: 24px;
-            cursor: pointer;
-        }
-        .tone-indicator {
-            font-size: 13px;
-            color: var(--accent);
-            margin-top: 8px;
-        }
-        @media (max-width: 768px) {
-            .chat-container {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: auto;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
+        
+        #chat-messages {
+            scroll-behavior: smooth;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">
-                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjNGRmMGZmIiBkPSJNMjU2LDhDMTE5LDgsOCwxMTksOCwyNTZzMTExLDI0OCwyNDgsMjQ4czI0OC0xMTEsMjQ4LTI0OFMzOTMsOCwyNTYsOHogTTM5MC41LDM5MC41TDEwNC41LDEwNC41bC0yMi42LDIyLjZsMjg2LDI4NkwzOTAuNSwzOTAuNXogTTEzMy40LDMxMS4xYy0xOC0yNi4zLTI4LjEtNTcuNS0yOC4xLTkwLjZjMC0xMDYuOSw4Ni42LTE5My41LDE5My41LTE5My41YzMzLjEsMCw2NC4zLDEwLjEsOTAuNiwyOC4xTDEzMy40LDMxMS4xeiBNMzc4LjYsMjAwLjljMTgtMjYuMywyOC4xLTU3LjUsMjguMS05MC42YzAtMTA2LjktODYuNi0xOTMuNS0xOTMuNS0xOTMuNWMtMzMuMSwwLTY0LjMsMTAuMS05MC42LDI4LjFMMzc4LjYsMjAwLjl6Ii8+PC9zdmc+" alt="StellarMind Logo">
-                <h1>StellarMind AI</h1>
+    <div class="app-container">
+        <!-- Sidebar with controls -->
+        <div class="sidebar">
+            <h2 style="color: var(--comms-green); margin-top: 0;">BEACON GUIDANCE</h2>
+            <div class="status-bar">
+                <span class="memory-indicator">SYSTEMS ONLINE</span>
+                <span id="currentDistance">Range: 0 AU</span>
             </div>
-            <div class="theme-selector">
-                <div class="theme-btn theme-1 active" data-theme="1"></div>
-                <div class="theme-btn theme-2" data-theme="2"></div>
-                <div class="theme-btn theme-3" data-theme="3"></div>
-                <div class="theme-btn theme-4" data-theme="4"></div>
-                <div class="theme-btn theme-5" data-theme="5"></div>
-                <div class="theme-btn theme-6" data-theme="6"></div>
+            
+            <!-- Sensor Panel -->
+            <div class="section-title">NAVIGATION SENSORS</div>
+            <div class="sensor-panel">
+                <div class="sensor-card">
+                    <div>Beacon Signal</div>
+                    <div class="sensor-value" id="signalValue">100%</div>
+                    <div class="sensor-unit">strength</div>
+                    <div class="sensor-status status-normal" id="signalStatus">Locked</div>
+                </div>
+                <div class="sensor-card">
+                    <div>Time Delay</div>
+                    <div class="sensor-value" id="delayValue">0.0</div>
+                    <div class="sensor-unit">minutes</div>
+                    <div class="sensor-status status-normal" id="delayStatus">Nominal</div>
+                </div>
+                <div class="sensor-card">
+                    <div>Relative Velocity</div>
+                    <div class="sensor-value" id="velocityValue">0</div>
+                    <div class="sensor-unit">km/s</div>
+                    <div class="sensor-status status-normal" id="velocityStatus">Stationary</div>
+                </div>
+                <div class="sensor-card">
+                    <div>Bearing</div>
+                    <div class="sensor-value" id="bearingValue">000°</div>
+                    <div class="sensor-unit">azimuth</div>
+                    <div class="sensor-status status-normal" id="bearingStatus">On course</div>
+                </div>
             </div>
-        </header>
-        <div class="stats-panel">
-            <h2>Performance Metrics</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3>Response Time</h3>
-                    <div class="value">127ms</div>
-                    <div class="description">Average response latency (benchmark: GPT-4 320ms)</div>
+            
+            <!-- Control Panel -->
+            <div class="section-title">GUIDANCE CONTROLS</div>
+            <div class="control-panel">
+                <div class="control-btn" id="lockBtn">
+                    <div style="font-size: 1.5em;">🔒</div>
+                    <div>Lock Beacon</div>
                 </div>
-                <div class="stat-card">
-                    <h3>Context Length</h3>
-                    <div class="value">∞</div>
-                    <div class="description">Infinite memory of conversation history</div>
+                <div class="control-btn" id="scanBtn">
+                    <div style="font-size: 1.5em;">📡</div>
+                    <div>Scan</div>
                 </div>
-                <div class="stat-card">
-                    <h3>Languages</h3>
-                    <div class="value">247</div>
-                    <div class="description">Fluent with idiomatic translations</div>
+                <div class="control-btn" id="autoBtn">
+                    <div style="font-size: 1.5em;">🤖</div>
+                    <div>Auto-nav</div>
                 </div>
-                <div class="stat-card">
-                    <h3>Precision</h3>
-                    <div class="value">99.8%</div>
-                    <div class="description">Accuracy on space science benchmarks</div>
+                <div class="control-btn" id="thrustersBtn">
+                    <div style="font-size: 1.5em;">🚀</div>
+                    <div>Thrusters</div>
                 </div>
-                <div class="stat-card">
-                    <h3>Image Analysis</h3>
-                    <div class="value">50MP</div>
-                    <div class="description">Max resolution for screenshot-to-code</div>
+                <div class="control-btn" id="commsBtn">
+                    <div style="font-size: 1.5em;">📶</div>
+                    <div>Comms</div>
                 </div>
-                <div class="stat-card">
-                    <h3>Emotion Detection</h3>
-                    <div class="value">32</div>
-                    <div class="description">Distinct emotional states recognized</div>
+                <div class="control-btn" id="sensorsBtn">
+                    <div style="font-size: 1.5em;">🔭</div>
+                    <div>Sensors</div>
+                </div>
+                <div class="control-btn warning" id="adjustBtn">
+                    <div style="font-size: 1.5em;">🔄</div>
+                    <div>Adjust</div>
+                </div>
+                <div class="control-btn warning" id="overrideBtn">
+                    <div style="font-size: 1.5em;">✋</div>
+                    <div>Override</div>
+                </div>
+                <div class="control-btn critical" id="emergencyBtn">
+                    <div style="font-size: 1.5em;">🚨</div>
+                    <div>EMERGENCY</div>
+                </div>
+            </div>
+            
+            <!-- Navigation Shortcuts -->
+            <div class="section-title">NAVIGATION</div>
+            <button class="feature-btn" id="navChatBtn">Comms Interface</button>
+            <button class="feature-btn" id="navDataBtn">Beacon Data</button>
+            <button class="feature-btn" id="navToolsBtn">Navigation Tools</button>
+            <button class="feature-btn" id="navLogBtn">Mission Log</button>
+            
+            <!-- Utilities -->
+            <div class="section-title">UTILITIES</div>
+            <button class="feature-btn" id="calcBtn">Course Calculator</button>
+            <button class="feature-btn" id="helpBtn">Help Guide</button>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Tab Bar -->
+            <div class="tab-bar">
+                <div class="tab active" data-tab="chat">Comms Interface</div>
+                <div class="tab" data-tab="data">Beacon Data</div>
+                <div class="tab" data-tab="tools">Navigation Tools</div>
+                <div class="tab" data-tab="history">Mission Log</div>
+            </div>
+            
+            <!-- Chat Tab -->
+            <div class="tab-content active" id="chat">
+                <div class="chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message bot-message">
+                            <div class="timestamp">SYSTEM INITIALIZED | Range: 0 AU</div>
+                            <p>Welcome to StellarMind Beacon Guidance System. All navigation systems are online and ready for interstellar operations.</p>
+                            <p>Current status: <span class="tool-animation">✔ Beacon sensors active</span> | <span class="tool-animation">✔ Navigation systems nominal</span> | <span class="tool-animation">✔ Comms ready</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="input-area">
+                        <div class="input-row">
+                            <textarea class="text-input" placeholder="Type message to beacon..." id="chat-input"></textarea>
+                            <input type="file" class="screenshot-upload" id="file-upload">
+                            <label for="file-upload" class="upload-btn" id="upload-label">📎</label>
+                            <button class="send-btn" id="send-btn">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Beacon Data Tab -->
+            <div class="tab-content" id="data">
+                <h2>Beacon Navigation Data</h2>
+                
+                <div class="data-section">
+                    <h3 class="section-title">BEACON TELEMETRY</h3>
+                    <div class="flashcard">
+                        <div id="beaconTelemetry">Acquiring beacon data...</div>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <h3 class="section-title">RELATIVE POSITION</h3>
+                    <div class="flashcard">
+                        <div id="positionData">Calculating relative position...</div>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <h3 class="section-title">SYSTEM STATUS</h3>
+                    <div class="flashcard">
+                        <table class="data-table">
+                            <tr>
+                                <th>System</th>
+                                <th>Status</th>
+                                <th>Details</th>
+                            </tr>
+                            <tr>
+                                <td>Beacon Lock</td>
+                                <td id="lockStatusCell">Searching</td>
+                                <td id="lockDetails">No beacon acquired</td>
+                            </tr>
+                            <tr>
+                                <td>Navigation</td>
+                                <td id="navStatus">Standby</td>
+                                <td id="navDetails">Waiting for beacon lock</td>
+                            </tr>
+                            <tr>
+                                <td>Thrusters</td>
+                                <td id="thrusterStatus">Ready</td>
+                                <td id="thrusterDetails">100% fuel remaining</td>
+                            </tr>
+                            <tr>
+                                <td>Comms</td>
+                                <td id="commsStatusCell">Active</td>
+                                <td id="commsDetails">Signal strength: 0%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="nav-btn" id="dataPrevBtn">Previous</button>
+                    <button class="nav-btn" id="dataNextBtn">Next</button>
+                </div>
+            </div>
+            
+            <!-- Navigation Tools Tab -->
+            <div class="tab-content" id="tools">
+                <h2>Navigation Instruments</h2>
+                
+                <div class="data-section">
+                    <h3 class="section-title">CORE TOOLS</h3>
+                    <div class="flashcard">
+                        <button class="feature-btn" id="courseBtn">Course Calculator</button>
+                        <button class="feature-btn" id="fuelBtn">Fuel Estimator</button>
+                        <button class="feature-btn" id="signalBtn">Signal Analyzer</button>
+                        <button class="feature-btn" id="trajectoryBtn">Trajectory Plotter</button>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <h3 class="section-title">ACTIVE TOOL</h3>
+                    <div id="activeToolOutput">
+                        <div class="flashcard">
+                            <p>No tool currently active. Select a tool from above to begin.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="nav-btn" id="toolsPrevBtn">Previous</button>
+                    <button class="nav-btn" id="toolsNextBtn">Next</button>
+                </div>
+            </div>
+            
+            <!-- Mission Log Tab -->
+            <div class="tab-content" id="history">
+                <h2>Mission Timeline</h2>
+                
+                <div class="data-section">
+                    <h3 class="section-title">CURRENT MISSION</h3>
+                    <div class="flashcard">
+                        <div id="currentMissionInfo">Initializing mission sequence...</div>
+                        <div class="progress-container">
+                            <div>Mission Progress:</div>
+                            <div class="progress-bar"><div class="progress-fill" id="missionProgress"></div></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <h3 class="section-title">MISSION EVENTS</h3>
+                    <div class="flashcard">
+                        <table class="data-table" id="missionEventsTable">
+                            <tr>
+                                <th>Time</th>
+                                <th>Range</th>
+                                <th>Event</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="data-section">
+                    <h3 class="section-title">MISSION STATISTICS</h3>
+                    <div class="flashcard">
+                        <div id="missionStatistics">Calculating mission statistics...</div>
+                    </div>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button class="nav-btn" id="historyPrevBtn">Previous</button>
+                    <button class="nav-btn" id="historyNextBtn">Next</button>
                 </div>
             </div>
         </div>
-        <div class="chat-container">
-            <div class="sidebar">
-                <div class="sidebar-section">
-                    <h3>AI Persona</h3>
-                    <div class="mode-selector" id="persona-selector">
-                        <button class="mode-btn active" data-persona="Default (Scientific)">Default (Scientific)</button>
-                        <button class="mode-btn" data-persona="Carl Sagan">Carl Sagan</button>
-                        <button class="mode-btn" data-persona="Neil deGrasse Tyson">Neil deGrasse Tyson</button>
-                        <button class="mode-btn" data-persona="Elon Musk">Elon Musk</button>
-                        <button class="mode-btn" data-persona="Custom...">Custom...</button>
-                    </div>
-                </div>
-                <div class="sidebar-section">
-                    <h3>Tone Adjustment</h3>
-                    <div class="slider-container">
-                        <label for="formality">Formality</label>
-                        <input type="range" min="0" max="100" value="70" class="slider" id="formality">
-                    </div>
-                    <div class="slider-container">
-                        <label for="technicality">Technical Depth</label>
-                        <input type="range" min="0" max="100" value="80" class="slider" id="technicality">
-                    </div>
-                    <div class="tone-indicator" id="tone-indicator">
-                        Formality: 70 | Technical Depth: 80
-                    </div>
-                </div>
-                <div class="sidebar-section">
-                    <h3>Space Exploration Tools</h3>
-                    <div class="mode-selector" id="tools-selector">
-                        <button class="mode-btn" data-tool="Orbit Calculator">Orbit Calculator</button>
-                        <button class="mode-btn" data-tool="Fuel Estimation">Fuel Estimation</button>
-                        <button class="mode-btn" data-tool="Signal Delay">Signal Delay</button>
-                        <button class="mode-btn" data-tool="Habitat Design">Habitat Design</button>
-                        <button class="mode-btn" data-tool="Mission Planner">Mission Planner</button>
-                    </div>
-                </div>
-                <div class="sidebar-section">
-                    <h3>Quick Actions</h3>
-                    <button class="mode-btn" data-action="Create Study Notes">Create Study Notes</button>
-                    <button class="mode-btn" data-action="Generate Report">Generate Report</button>
-                    <button class="mode-btn" data-action="Analyze Data">Analyze Data</button>
-                    <button class="mode-btn" data-action="Mental Health Check">Mental Health Check</button>
-                </div>
-            </div>
-            <div class="chat-area">
-                <div class="chat-messages" id="chat-messages">
-                    <div class="message">
-                        <div class="message-user">Space Specialist:</div>
-                        <div class="message-ai">Welcome, Space Exploration Specialist. I'm <span id="persona-label">StellarMind AI</span>, your advanced assistant for all space-related research, calculations, and mission planning. How can I assist with your cosmic endeavors today?</div>
-                    </div>
-                </div>
-                <div class="input-area">
-                    <div class="input-row">
-                        <textarea class="text-input" placeholder="Type your message..." id="chat-input"></textarea>
-                        <input type="file" class="file-upload" id="file-upload">
-                        <label for="file-upload" class="upload-btn" id="upload-label">Upload</label>
-                        <button class="send-btn" id="send-btn">Send</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="features-grid">
-            <div class="feature-card">
-                <h3>Real-Time Orbit Calculations</h3>
-                <p>Compute and visualize orbital mechanics for mission planning and analysis.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Fuel & Resource Estimation</h3>
-                <p>Estimate fuel requirements and optimize payload configurations for interplanetary travel.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Signal Delay Analysis</h3>
-                <p>Calculate communication delays for deep space missions and remote operations.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Habitat & Life Support Design</h3>
-                <p>Model and simulate habitat parameters for long-duration missions.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Mission Planning Suite</h3>
-                <p>Comprehensive tools for scheduling, risk assessment, and mission logistics.</p>
-            </div>
-        </div>
-        <footer>
-            &copy; 2025 StellarMind AI. All rights reserved.
-        </footer>
     </div>
-    <!-- Overlay for tools -->
-    <div class="overlay" id="tool-overlay">
-        <div class="overlay-content" id="overlay-content">
-            <button class="close-overlay" id="close-overlay">&times;</button>
-            <div id="tool-content"></div>
-        </div>
+    
+    <div class="performance-stats">
+        <h3>Beacon Status</h3>
+        <p>Range: <span id="statsDistance">0 AU</span></p>
+        <p>Signal: <span id="statsSignal">0%</span> | Delay: <span id="statsDelay">0m</span></p>
+        <p>Velocity: <span id="statsVelocity">0 km/s</span></p>
     </div>
+
     <script>
-        // Theme switching
-        const themeBtns = document.querySelectorAll('.theme-btn');
-        themeBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                themeBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const theme = btn.dataset.theme;
-                switch(theme) {
-                    case "1":
-                        document.body.style.backgroundColor = "#1a1a2e";
-                        document.body.style.backgroundImage = "radial-gradient(circle at 10% 20%, rgba(11, 61, 145, 0.2) 0%, transparent 20%), radial-gradient(circle at 90% 80%, rgba(252, 61, 33, 0.2) 0%, transparent 20%)";
-                        break;
-                    case "2":
-                        document.body.style.backgroundColor = "#000000";
-                        document.body.style.backgroundImage = "linear-gradient(135deg, #4b0082, #000000)";
-                        break;
-                    case "3":
-                        document.body.style.backgroundColor = "#000000";
-                        document.body.style.backgroundImage = "linear-gradient(135deg, #006400, #000000)";
-                        break;
-                    case "4":
-                        document.body.style.backgroundColor = "#000000";
-                        document.body.style.backgroundImage = "linear-gradient(135deg, #8b0000, #000000)";
-                        break;
-                    case "5":
-                        document.body.style.backgroundColor = "#000000";
-                        document.body.style.backgroundImage = "linear-gradient(135deg, #ff8c00, #000000)";
-                        break;
-                    case "6":
-                        document.body.style.backgroundColor = "#000000";
-                        document.body.style.backgroundImage = "linear-gradient(135deg, #9400d3, #000000)";
-                        break;
+        // Global state with live sensor simulation
+        const state = {
+            // Beacon systems
+            distance: 0, // in AU
+            signalStrength: 0,
+            timeDelay: 0,
+            relativeVelocity: 0,
+            bearing: 0,
+            beaconLock: false,
+            autoNav: false,
+            thrustersActive: false,
+            commsActive: true,
+            sensorsActive: true,
+            
+            // Mission data
+            missionStartTime: new Date(),
+            missionHistory: [],
+            
+            // System intervals
+            sensorInterval: null,
+            navigationInterval: null,
+            
+            // UI state
+            currentTab: 'chat',
+            dataPage: 1,
+            toolsPage: 1,
+            historyPage: 1
+        };
+
+        // Initialize all systems when page loads
+        function initBeaconSystem() {
+            // Start sensor updates
+            state.sensorInterval = setInterval(updateSensors, 1000);
+            
+            // Initialize controls
+            initControls();
+            
+            // Initialize navigation
+            initNavigation();
+            
+            // Start mission log
+            logMissionEvent("Beacon guidance system initialized");
+            updateMissionProgress();
+            
+            // Initial system message
+            addSystemMessage("All systems online and ready for beacon acquisition");
+        }
+
+        // Update all sensor readings
+        function updateSensors() {
+            // Simulate beacon acquisition
+            if (!state.beaconLock && Math.random() > 0.7) {
+                state.beaconLock = true;
+                state.distance = (Math.random() * 10).toFixed(2);
+                logMissionEvent("Beacon acquired at " + state.distance + " AU");
+            }
+            
+            // Update beacon-based sensors
+            if (state.beaconLock) {
+                state.signalStrength = Math.min(100, 100 - (state.distance * 8) + (Math.random() * 10 - 5));
+                state.timeDelay = (state.distance * 8.3167).toFixed(1); // 1 AU ≈ 8.3167 light-minutes
+                state.relativeVelocity = (Math.random() * 5).toFixed(2);
+                state.bearing = Math.floor(Math.random() * 360);
+                
+                // Simulate approach if auto-nav is on
+                if (state.autoNav && state.distance > 0.1) {
+                    state.distance = Math.max(0.1, state.distance - 0.01);
+                }
+            } else {
+                state.signalStrength = 0;
+                state.timeDelay = 0;
+                state.relativeVelocity = 0;
+            }
+            
+            // Update displays
+            updateSensorDisplays();
+            checkWarnings();
+            updateSystemStatus();
+        }
+
+        // Update all sensor displays
+        function updateSensorDisplays() {
+            // Update numeric displays
+            document.getElementById('signalValue').textContent = state.signalStrength.toFixed(0) + '%';
+            document.getElementById('delayValue').textContent = state.timeDelay;
+            document.getElementById('velocityValue').textContent = state.relativeVelocity;
+            document.getElementById('bearingValue').textContent = state.bearing + '°';
+            
+            // Update status bar
+            document.getElementById('currentDistance').textContent = `Range: ${state.distance} AU`;
+            document.getElementById('statsDistance').textContent = `${state.distance} AU`;
+            document.getElementById('statsSignal').textContent = `${state.signalStrength.toFixed(0)}%`;
+            document.getElementById('statsDelay').textContent = `${state.timeDelay}m`;
+            document.getElementById('statsVelocity').textContent = `${state.relativeVelocity} km/s`;
+            
+            // Update beacon telemetry
+            updateBeaconTelemetry();
+        }
+
+        // Update beacon telemetry display
+        function updateBeaconTelemetry() {
+            document.getElementById('beaconTelemetry').innerHTML = `
+                <p><strong>Signal Strength:</strong> ${state.signalStrength.toFixed(0)}%</p>
+                <p><strong>Time Delay:</strong> ${state.timeDelay} minutes</p>
+                <p><strong>Relative Velocity:</strong> ${state.relativeVelocity} km/s</p>
+                <p><strong>Bearing:</strong> ${state.bearing}°</p>
+                <p><strong>Distance:</strong> ${state.distance} AU (${(state.distance * 149.6).toFixed(1)} million km)</p>
+            `;
+            
+            document.getElementById('positionData').innerHTML = `
+                <p><strong>X:</strong> ${(state.distance * Math.cos(state.bearing * Math.PI / 180)).toFixed(2)} AU</p>
+                <p><strong>Y:</strong> ${(state.distance * Math.sin(state.bearing * Math.PI / 180)).toFixed(2)} AU</p>
+                <p><strong>Z:</strong> ${(Math.random() * 0.5).toFixed(2)} AU</p>
+            `;
+        }
+
+        // Update system status display
+        function updateSystemStatus() {
+            document.getElementById('lockStatusCell').textContent = 
+                state.beaconLock ? 'Locked' : 'Searching';
+            document.getElementById('lockDetails').textContent = 
+                state.beaconLock ? `Beacon at ${state.distance} AU` : 'No beacon acquired';
+            
+            document.getElementById('navStatus').textContent = 
+                state.autoNav ? 'Auto-nav Active' : 'Standby';
+            document.getElementById('navDetails').textContent = 
+                state.autoNav ? `Approaching at ${state.relativeVelocity} km/s` : 'Waiting for beacon lock';
+            
+            document.getElementById('thrusterStatus').textContent = 
+                state.thrustersActive ? 'Active' : 'Ready';
+            document.getElementById('thrusterDetails').textContent = 
+                state.thrustersActive ? 'Thrusters firing' : '100% fuel remaining';
+            
+            document.getElementById('commsStatusCell').textContent = 
+                state.commsActive ? 'Active' : 'Offline';
+            document.getElementById('commsDetails').textContent = 
+                `Signal strength: ${state.signalStrength.toFixed(0)}%`;
+        }
+
+        // Check for warning conditions
+        function checkWarnings() {
+            // Signal warnings
+            if (state.signalStrength < 20 && state.beaconLock) {
+                setSensorStatus('signalStatus', 'warning', 'Weak Signal');
+            } else if (state.beaconLock) {
+                setSensorStatus('signalStatus', 'normal', 'Locked');
+            } else {
+                setSensorStatus('signalStatus', 'critical', 'No Lock');
+            }
+            
+            // Delay warnings
+            if (state.timeDelay > 10) {
+                setSensorStatus('delayStatus', 'warning', 'High Delay');
+            } else if (state.beaconLock) {
+                setSensorStatus('delayStatus', 'normal', 'Nominal');
+            } else {
+                setSensorStatus('delayStatus', 'critical', 'No Signal');
+            }
+            
+            // Velocity warnings
+            if (state.relativeVelocity > 3) {
+                setSensorStatus('velocityStatus', 'warning', 'High Velocity');
+            } else if (state.beaconLock) {
+                setSensorStatus('velocityStatus', 'normal', 'Nominal');
+            } else {
+                setSensorStatus('velocityStatus', 'critical', 'Unknown');
+            }
+            
+            // Bearing warnings
+            if (state.beaconLock && Math.abs(state.bearing - 180) > 30) {
+                setSensorStatus('bearingStatus', 'warning', 'Off Course');
+            } else if (state.beaconLock) {
+                setSensorStatus('bearingStatus', 'normal', 'On Course');
+            } else {
+                setSensorStatus('bearingStatus', 'critical', 'No Vector');
+            }
+        }
+
+        function setSensorStatus(elementId, status, text) {
+            const element = document.getElementById(elementId);
+            element.className = `sensor-status status-${status}`;
+            element.textContent = text;
+        }
+
+        // Initialize control buttons
+        function initControls() {
+            // Beacon controls
+            document.getElementById('lockBtn').addEventListener('click', toggleBeaconLock);
+            document.getElementById('scanBtn').addEventListener('click', scanForBeacons);
+            document.getElementById('autoBtn').addEventListener('click', toggleAutoNav);
+            document.getElementById('thrustersBtn').addEventListener('click', toggleThrusters);
+            document.getElementById('commsBtn').addEventListener('click', toggleComms);
+            document.getElementById('sensorsBtn').addEventListener('click', toggleSensors);
+            document.getElementById('adjustBtn').addEventListener('click', adjustCourse);
+            document.getElementById('overrideBtn').addEventListener('click', manualOverride);
+            document.getElementById('emergencyBtn').addEventListener('click', emergencyProtocol);
+            
+            // Chat controls
+            document.getElementById('send-btn').addEventListener('click', sendMessage);
+            document.getElementById('chat-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
                 }
             });
-        });
-
-        // Persona switching
-        const personaBtns = document.querySelectorAll('#persona-selector .mode-btn');
-        let currentPersona = "Default (Scientific)";
-        personaBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                personaBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentPersona = btn.dataset.persona;
-                document.getElementById('persona-label').textContent = currentPersona === "Default (Scientific)" ? "StellarMind AI" : currentPersona;
-                addAIMessage(`Persona switched to <b>${currentPersona}</b>.`, true);
+            
+            // File upload
+            document.getElementById('file-upload').addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    addUserMessage(`Uploaded file: ${this.files[0].name}`);
+                    setTimeout(() => {
+                        addSystemMessage(`File ${this.files[0].name} received for analysis`);
+                    }, 500);
+                }
             });
-        });
-
-        // Tone adjustment
-        const formalitySlider = document.getElementById('formality');
-        const technicalitySlider = document.getElementById('technicality');
-        const toneIndicator = document.getElementById('tone-indicator');
-        function updateToneIndicator() {
-            toneIndicator.textContent = `Formality: ${formalitySlider.value} | Technical Depth: ${technicalitySlider.value}`;
+            
+            // Tool buttons
+            document.getElementById('courseBtn').addEventListener('click', () => showTool('Course Calculator'));
+            document.getElementById('fuelBtn').addEventListener('click', () => showTool('Fuel Estimator'));
+            document.getElementById('signalBtn').addEventListener('click', () => showTool('Signal Analyzer'));
+            document.getElementById('trajectoryBtn').addEventListener('click', () => showTool('Trajectory Plotter'));
+            
+            // Help button
+            document.getElementById('helpBtn').addEventListener('click', showHelp);
         }
-        formalitySlider.addEventListener('input', updateToneIndicator);
-        technicalitySlider.addEventListener('input', updateToneIndicator);
 
-        // Tool overlays
-        const toolsSelector = document.getElementById('tools-selector');
-        const overlay = document.getElementById('tool-overlay');
-        const overlayContent = document.getElementById('tool-content');
-        const closeOverlay = document.getElementById('close-overlay');
-        toolsSelector.querySelectorAll('.mode-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tool = btn.dataset.tool;
-                showToolOverlay(tool);
+        // Initialize navigation
+        function initNavigation() {
+            // Tab navigation
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+                    state.currentTab = tab.dataset.tab;
+                    document.getElementById(tab.dataset.tab).classList.add('active');
+                });
             });
-        });
-        closeOverlay.addEventListener('click', () => {
-            overlay.classList.remove('active');
-        });
-        function showToolOverlay(tool) {
-            let html = '';
-            if (tool === "Orbit Calculator") {
-                html = `<h2>Orbit Calculator</h2>
-                    <p>Enter parameters to compute orbital elements:</p>
-                    <label>Semi-major axis (km): <input type="number" id="orbit-a" value="7000"></label><br>
-                    <label>Eccentricity: <input type="number" step="0.01" id="orbit-e" value="0.01"></label><br>
-                    <button id="orbit-calc-btn">Compute</button>
-                    <div id="orbit-result" style="margin-top:10px;"></div>`;
+            
+            // Navigation buttons
+            document.getElementById('navChatBtn').addEventListener('click', () => switchTab('chat'));
+            document.getElementById('navDataBtn').addEventListener('click', () => switchTab('data'));
+            document.getElementById('navToolsBtn').addEventListener('click', () => switchTab('tools'));
+            document.getElementById('navLogBtn').addEventListener('click', () => switchTab('history'));
+            
+            // Data page navigation
+            document.getElementById('dataPrevBtn').addEventListener('click', () => {
+                state.dataPage = Math.max(1, state.dataPage - 1);
+                updateDataPage();
+            });
+            document.getElementById('dataNextBtn').addEventListener('click', () => {
+                state.dataPage = state.dataPage + 1;
+                updateDataPage();
+            });
+            
+            // Tools page navigation
+            document.getElementById('toolsPrevBtn').addEventListener('click', () => {
+                state.toolsPage = Math.max(1, state.toolsPage - 1);
+                updateToolsPage();
+            });
+            document.getElementById('toolsNextBtn').addEventListener('click', () => {
+                state.toolsPage = state.toolsPage + 1;
+                updateToolsPage();
+            });
+            
+            // History page navigation
+            document.getElementById('historyPrevBtn').addEventListener('click', () => {
+                state.historyPage = Math.max(1, state.historyPage - 1);
+                updateHistoryPage();
+            });
+            document.getElementById('historyNextBtn').addEventListener('click', () => {
+                state.historyPage = state.historyPage + 1;
+                updateHistoryPage();
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            state.currentTab = tabName;
+        }
+
+        function updateDataPage() {
+            // In a real implementation, this would load different data sets
+            addSystemMessage(`Loading beacon data page ${state.dataPage}`);
+        }
+
+        function updateToolsPage() {
+            // In a real implementation, this would show different tools
+            addSystemMessage(`Loading tools page ${state.toolsPage}`);
+        }
+
+        function updateHistoryPage() {
+            // In a real implementation, this would load different history segments
+            addSystemMessage(`Loading history page ${state.historyPage}`);
+        }
+
+        // Beacon control functions
+        function toggleBeaconLock() {
+            if (state.beaconLock) {
+                state.beaconLock = false;
+                state.distance = 0;
+                logMissionEvent("Beacon lock released");
+                addSystemMessage("Beacon lock released");
+            } else {
+                state.beaconLock = true;
+                state.distance = (Math.random() * 10).toFixed(2);
+                logMissionEvent(`Beacon acquired at ${state.distance} AU`);
+                addSystemMessage(`Beacon locked at ${state.distance} AU`);
             }
-            if (tool === "Fuel Estimation") {
-                html = `<h2>Fuel Estimation</h2>
-                    <p>Estimate fuel for a mission:</p>
-                    <label>Delta-v (m/s): <input type="number" id="fuel-dv" value="9500"></label><br>
-                    <label>Exhaust velocity (m/s): <input type="number" id="fuel-ve" value="4500"></label><br>
-                    <label>Payload mass (kg): <input type="number" id="fuel-m0" value="1000"></label><br>
+            updateSystemStatus();
+        }
+
+        function scanForBeacons() {
+            addSystemMessage("Initiating beacon scan...");
+            setTimeout(() => {
+                if (Math.random() > 0.3) {
+                    state.beaconLock = true;
+                    state.distance = (Math.random() * 10).toFixed(2);
+                    logMissionEvent(`Beacon detected at ${state.distance} AU`);
+                    addSystemMessage(`Beacon acquired at ${state.distance} AU`);
+                } else {
+                    addSystemMessage("No beacons detected in scan range");
+                }
+            }, 2000);
+        }
+
+        function toggleAutoNav() {
+            state.autoNav = !state.autoNav;
+            if (state.autoNav) {
+                logMissionEvent("Auto-navigation engaged");
+                addSystemMessage("Auto-navigation engaged - approaching beacon");
+            } else {
+                logMissionEvent("Auto-navigation disengaged");
+                addSystemMessage("Auto-navigation disengaged");
+            }
+            updateSystemStatus();
+        }
+
+        function toggleThrusters() {
+            state.thrustersActive = !state.thrustersActive;
+            if (state.thrustersActive) {
+                logMissionEvent("Thrusters activated");
+                addSystemMessage("Thrusters firing");
+            } else {
+                logMissionEvent("Thrusters deactivated");
+                addSystemMessage("Thrusters offline");
+            }
+            updateSystemStatus();
+        }
+
+        function toggleComms() {
+            state.commsActive = !state.commsActive;
+            if (state.commsActive) {
+                logMissionEvent("Communications activated");
+                addSystemMessage("Communications online");
+            } else {
+                logMissionEvent("Communications deactivated");
+                addSystemMessage("Communications offline");
+            }
+            updateSystemStatus();
+        }
+
+        function toggleSensors() {
+            state.sensorsActive = !state.sensorsActive;
+            if (state.sensorsActive) {
+                logMissionEvent("Sensors activated");
+                addSystemMessage("Sensor array online");
+            } else {
+                logMissionEvent("Sensors deactivated");
+                addSystemMessage("Sensor array offline");
+            }
+        }
+
+        function adjustCourse() {
+            if (state.beaconLock) {
+                const adjustment = (Math.random() * 20 - 10).toFixed(1);
+                state.bearing = (state.bearing + Number(adjustment)) % 360;
+                logMissionEvent(`Course adjusted by ${adjustment}°`);
+                addSystemMessage(`Course adjusted by ${adjustment}° - new bearing ${state.bearing}°`);
+            } else {
+                addSystemMessage("Cannot adjust course - no beacon lock");
+            }
+        }
+
+        function manualOverride() {
+            state.autoNav = false;
+            logMissionEvent("Manual override engaged");
+            addSystemMessage("Manual override - full control enabled");
+            updateSystemStatus();
+        }
+
+        function emergencyProtocol() {
+            state.autoNav = false;
+            state.thrustersActive = true;
+            logMissionEvent("EMERGENCY PROTOCOL ACTIVATED");
+            addSystemMessage("EMERGENCY: Full stop initiated");
+            setTimeout(() => {
+                state.thrustersActive = false;
+                logMissionEvent("Emergency stop complete");
+                addSystemMessage("Emergency stop complete - all systems nominal");
+            }, 3000);
+            updateSystemStatus();
+        }
+
+        // Mission logging
+        function logMissionEvent(event) {
+            const timestamp = new Date();
+            const logEntry = {
+                time: timestamp.toISOString(),
+                distance: state.distance,
+                event: event
+            };
+            state.missionHistory.push(logEntry);
+            
+            // Update mission log display
+            updateMissionLog();
+        }
+
+        function updateMissionLog() {
+            const table = document.getElementById('missionEventsTable');
+            // Clear existing rows (except header)
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+            
+            // Add recent events (last 10)
+            state.missionHistory.slice(-10).reverse().forEach(event => {
+                const row = table.insertRow(1);
+                row.innerHTML = `
+                    <td>${new Date(event.time).toLocaleTimeString()}</td>
+                    <td>${event.distance} AU</td>
+                    <td>${event.event}</td>
+                `;
+            });
+            
+            // Update mission statistics
+            updateMissionStatistics();
+        }
+
+        function updateMissionStatistics() {
+            const missionTime = Math.floor((new Date() - state.missionStartTime) / 60000);
+            const maxDistance = Math.max(...state.missionHistory.map(e => Number(e.distance)));
+            
+            document.getElementById('currentMissionInfo').innerHTML = `
+                <p><strong>Mission started:</strong> ${state.missionStartTime.toLocaleTimeString()}</p>
+                <p><strong>Duration:</strong> ${missionTime} minutes</p>
+                <p><strong>Max distance:</strong> ${maxDistance} AU</p>
+                <p><strong>Current range:</strong> ${state.distance} AU</p>
+            `;
+            
+            // Update progress bar (based on distance)
+            const maxDistanceForVisualization = 10; // For visualization purposes
+            const progress = Math.min(100, (state.distance / maxDistanceForVisualization) * 100);
+            document.getElementById('missionProgress').style.width = `${progress}%`;
+            
+            // Update statistics card
+            document.getElementById('missionStatistics').innerHTML = `
+                <p><strong>Total events logged:</strong> ${state.missionHistory.length}</p>
+                <p><strong>Beacon locks:</strong> ${state.missionHistory.filter(e => e.event.includes('acquired')).length}</p>
+                <p><strong>Average velocity:</strong> ${(maxDistance / missionTime * 149.6).toFixed(2)} million km/h</p>
+            `;
+        }
+
+        function updateMissionProgress() {
+            setInterval(() => {
+                updateMissionLog();
+            }, 60000); // Update every minute
+        }
+
+        // Tool functions
+        function showTool(tool) {
+            let html = '';
+            if (tool === "Course Calculator") {
+                html = `<h3>Course Calculator</h3>
+                    <label>Current Range (AU): <input type="number" id="course-range" value="${state.distance}"></label><br>
+                    <label>Bearing (deg): <input type="number" id="course-bearing" value="${state.bearing}"></label><br>
+                    <label>Desired Range (AU): <input type="number" id="course-target" value="0.1"></label><br>
+                    <button id="course-calc-btn">Calculate</button>
+                    <div id="course-result" style="margin-top:10px;"></div>`;
+            }
+            if (tool === "Fuel Estimator") {
+                html = `<h3>Fuel Estimator</h3>
+                    <label>Delta-v (km/s): <input type="number" id="fuel-dv" value="10"></label><br>
+                    <label>Specific Impulse (s): <input type="number" id="fuel-isp" value="450"></label><br>
+                    <label>Dry Mass (kg): <input type="number" id="fuel-mass" value="1000"></label><br>
                     <button id="fuel-calc-btn">Estimate</button>
                     <div id="fuel-result" style="margin-top:10px;"></div>`;
             }
-            if (tool === "Signal Delay") {
-                html = `<h2>Signal Delay</h2>
-                    <p>Calculate signal delay (one-way):</p>
-                    <label>Distance (km): <input type="number" id="delay-dist" value="384400"></label>
-                    <button id="delay-calc-btn">Calculate</button>
-                    <div id="delay-result" style="margin-top:10px;"></div>`;
+            if (tool === "Signal Analyzer") {
+                html = `<h3>Signal Analyzer</h3>
+                    <label>Frequency (MHz): <input type="number" id="signal-freq" value="1420"></label><br>
+                    <label>Bandwidth (kHz): <input type="number" id="signal-bw" value="100"></label><br>
+                    <button id="signal-calc-btn">Analyze</button>
+                    <div id="signal-result" style="margin-top:10px;"></div>`;
             }
-            if (tool === "Habitat Design") {
-                html = `<h2>Habitat Design</h2>
-                    <p>Model parameters for habitat:</p>
-                    <label>Crew size: <input type="number" id="hab-crew" value="6"></label><br>
-                    <label>Duration (days): <input type="number" id="hab-days" value="180"></label><br>
-                    <button id="hab-calc-btn">Estimate</button>
-                    <div id="hab-result" style="margin-top:10px;"></div>`;
+            if (tool === "Trajectory Plotter") {
+                html = `<h3>Trajectory Plotter</h3>
+                    <p>Current trajectory to beacon:</p>
+                    <div style="height:200px; background:#111133; border:1px solid var(--comms-green); display:flex; justify-content:center; align-items:center;">
+                        <p>Trajectory visualization</p>
+                    </div>
+                    <p>Estimated time to intercept: ${(state.distance * 10).toFixed(1)} hours</p>`;
             }
-            if (tool === "Mission Planner") {
-                html = `<h2>Mission Planner</h2>
-                    <p>Schedule mission phases and logistics.</p>
-                    <ul>
-                        <li>Phase 1: Launch Preparation</li>
-                        <li>Phase 2: Transit</li>
-                        <li>Phase 3: Arrival & Operations</li>
-                        <li>Phase 4: Return</li>
-                    </ul>
-                    <p><i>This is a mockup. Integrate your backend for full planning features.</i></p>`;
-            }
-            overlayContent.innerHTML = html;
-            overlay.classList.add('active');
+            
+            document.getElementById('activeToolOutput').innerHTML = html;
+            
+            // Set up tool calculations
             setTimeout(() => {
-                if (tool === "Orbit Calculator") {
-                    document.getElementById('orbit-calc-btn').onclick = function() {
-                        var a = Number(document.getElementById('orbit-a').value);
-                        var e = Number(document.getElementById('orbit-e').value);
-                        var periapsis = a * (1 - e);
-                        var apoapsis = a * (1 + e);
-                        document.getElementById('orbit-result').innerHTML =
-                            'Periapsis: ' + periapsis.toFixed(2) + ' km<br>Apoapsis: ' + apoapsis.toFixed(2) + ' km';
+                if (tool === "Course Calculator") {
+                    document.getElementById('course-calc-btn').onclick = function() {
+                        const range = Number(document.getElementById('course-range').value);
+                        const bearing = Number(document.getElementById('course-bearing').value);
+                        const target = Number(document.getElementById('course-target').value);
+                        const deltaV = (range - target) * 5;
+                        document.getElementById('course-result').innerHTML =
+                            `Required Δv: ${deltaV.toFixed(2)} km/s<br>Time: ${((range - target) * 10).toFixed(1)} hours`;
                     }
                 }
-                if (tool === "Fuel Estimation") {
+                if (tool === "Fuel Estimator") {
                     document.getElementById('fuel-calc-btn').onclick = function() {
-                        var dv = Number(document.getElementById('fuel-dv').value);
-                        var ve = Number(document.getElementById('fuel-ve').value);
-                        var m0 = Number(document.getElementById('fuel-m0').value);
-                        var mf = m0 / Math.exp(dv/ve);
-                        var fuel = m0 - mf;
+                        const dv = Number(document.getElementById('fuel-dv').value);
+                        const isp = Number(document.getElementById('fuel-isp').value);
+                        const mass = Number(document.getElementById('fuel-mass').value);
+                        const fuel = mass * (Math.exp(dv / (isp * 9.81)) - 1);
                         document.getElementById('fuel-result').innerHTML =
-                            'Fuel required: ' + fuel.toFixed(2) + ' kg';
+                            `Fuel required: ${fuel.toFixed(2)} kg`;
                     }
                 }
-                if (tool === "Signal Delay") {
-                    document.getElementById('delay-calc-btn').onclick = function() {
-                        var d = Number(document.getElementById('delay-dist').value);
-                        var delay = d * 1000 / 299792458;
-                        document.getElementById('delay-result').innerHTML =
-                            'Delay: ' + delay.toFixed(2) + ' seconds';
-                    }
-                }
-                if (tool === "Habitat Design") {
-                    document.getElementById('hab-calc-btn').onclick = function() {
-                        var crew = Number(document.getElementById('hab-crew').value);
-                        var days = Number(document.getElementById('hab-days').value);
-                        var water = crew * days * 3; // 3L per day
-                        var food = crew * days * 0.8; // 0.8kg per day
-                        document.getElementById('hab-result').innerHTML =
-                            'Water needed: ' + water + ' L<br>Food needed: ' + food + ' kg';
+                if (tool === "Signal Analyzer") {
+                    document.getElementById('signal-calc-btn').onclick = function() {
+                        const freq = Number(document.getElementById('signal-freq').value);
+                        const bw = Number(document.getElementById('signal-bw').value);
+                        const snr = (freq / 1420) * (100 / bw) * state.signalStrength / 100;
+                        document.getElementById('signal-result').innerHTML =
+                            `Estimated SNR: ${snr.toFixed(2)} dB<br>Doppler shift: ${(Math.random() * 5).toFixed(2)} kHz`;
                     }
                 }
             }, 100);
         }
-        document.addEventListener('keydown', (e) => {
-            if (e.key === "Escape") document.getElementById('tool-overlay').classList.remove('active');
-        });
-        // Quick Actions
-        document.querySelectorAll('[data-action]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const action = btn.dataset.action;
-                let aiReply = '';
-                switch(action) {
-                    case "Create Study Notes":
-                        aiReply = "Here are your study notes on orbital mechanics:<br>- Kepler's Laws<br>- Hohmann Transfer<br>- Delta-v budgeting<br>...and more.";
-                        break;
-                    case "Generate Report":
-                        aiReply = "Mission report generated. Summary: All systems nominal, trajectory optimal, risks minimal.";
-                        break;
-                    case "Analyze Data":
-                        aiReply = "Data analyzed: No anomalies detected. Signal-to-noise ratio within expected parameters.";
-                        break;
-                    case "Mental Health Check":
-                        aiReply = "Mental health check: All crew members report positive mood and no signs of stress.";
-                        break;
-                }
-                addAIMessage(aiReply, false);
-            });
-        });
-        // Chat send
-        const chatInput = document.getElementById('chat-input');
-        const sendBtn = document.getElementById('send-btn');
-        const chatMessages = document.getElementById('chat-messages');
-        function addUserMessage(text) {
-            const msg = document.createElement('div');
-            msg.className = 'message';
-            msg.innerHTML = `<div class="message-user">User:</div><div>${text}</div>`;
-            chatMessages.appendChild(msg);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-        function addAIMessage(text, personaSwitch=false) {
-            const msg = document.createElement('div');
-            msg.className = 'message';
-            msg.innerHTML = `<div class="message-user">${currentPersona}:</div><div class="message-ai${personaSwitch ? ' persona' : ''}">${text}</div>`;
-            chatMessages.appendChild(msg);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-        sendBtn.addEventListener('click', () => {
+
+        // Chat functionality
+        function sendMessage() {
+            const chatInput = document.getElementById('chat-input');
             const text = chatInput.value.trim();
             if (!text) return;
             addUserMessage(text);
             chatInput.value = '';
             setTimeout(() => {
-                addAIMessage("Received: " + text, false);
+                generateResponse(text);
             }, 500);
-        });
-        chatInput.addEventListener('keydown', e => {
-            if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                sendBtn.click();
+        }
+
+        function addUserMessage(text) {
+            const chatMessages = document.getElementById('chat-messages');
+            const msg = document.createElement('div');
+            msg.className = 'message user-message';
+            msg.innerHTML = `<div class="timestamp">USER | ${new Date().toLocaleTimeString()}</div><div>${text}</div>`;
+            chatMessages.appendChild(msg);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addSystemMessage(text) {
+            const chatMessages = document.getElementById('chat-messages');
+            const msg = document.createElement('div');
+            msg.className = 'message system-message';
+            msg.innerHTML = `<div class="timestamp">SYSTEM | ${new Date().toLocaleTimeString()}</div><div>${text}</div>`;
+            chatMessages.appendChild(msg);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function generateResponse(query) {
+            const responses = {
+                status: `Current beacon status:<br>
+                        - Range: ${state.distance} AU<br>
+                        - Signal: ${state.signalStrength.toFixed(0)}%<br>
+                        - Delay: ${state.timeDelay} minutes<br>
+                        - Bearing: ${state.bearing}°`,
+                scan: "Initiating beacon scan...",
+                help: `Available commands:<br>
+                      - "status" - Current beacon status<br>
+                      - "scan" - Initiate beacon scan<br>
+                      - "lock" - Lock onto current beacon<br>
+                      - "autonav" - Toggle auto-navigation<br>
+                      - "emergency" - Emergency procedures`,
+                default: `Command received. For system status, say "status". For help, say "help".`
+            };
+
+            const lowerQuery = query.toLowerCase();
+            let response;
+
+            if (lowerQuery.includes('status')) {
+                response = responses.status;
+            } else if (lowerQuery.includes('scan')) {
+                response = responses.scan;
+                setTimeout(() => {
+                    if (Math.random() > 0.3) {
+                        state.beaconLock = true;
+                        state.distance = (Math.random() * 10).toFixed(2);
+                        addSystemMessage(`Beacon acquired at ${state.distance} AU`);
+                    } else {
+                        addSystemMessage("No beacons detected in scan range");
+                    }
+                }, 2000);
+            } else if (lowerQuery.includes('lock')) {
+                if (state.beaconLock) {
+                    state.beaconLock = false;
+                    response = "Beacon lock released";
+                } else {
+                    state.beaconLock = true;
+                    state.distance = (Math.random() * 10).toFixed(2);
+                    response = `Beacon locked at ${state.distance} AU`;
+                }
+            } else if (lowerQuery.includes('auto') || lowerQuery.includes('nav')) {
+                state.autoNav = !state.autoNav;
+                response = state.autoNav ? "Auto-navigation engaged" : "Auto-navigation disengaged";
+            } else if (lowerQuery.includes('emergency')) {
+                response = "EMERGENCY PROTOCOL INITIATED";
+                emergencyProtocol();
+            } else if (lowerQuery.includes('help')) {
+                response = responses.help;
+            } else {
+                response = responses.default;
             }
-        });
-        // File upload
-        const fileUpload = document.getElementById('file-upload');
-        fileUpload.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            addUserMessage(`Uploaded file: <b>${file.name}</b>`);
-            setTimeout(() => {
-                addAIMessage(`File <b>${file.name}</b> received and ready for analysis.`, false);
-            }, 500);
-        });
+
+            const chatMessages = document.getElementById('chat-messages');
+            const msg = document.createElement('div');
+            msg.className = 'message bot-message';
+            msg.innerHTML = `<div class="timestamp">BEACON AI | ${new Date().toLocaleTimeString()}</div><div>${response}</div>`;
+            chatMessages.appendChild(msg);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Help guide
+        function showHelp() {
+            switchTab('chat');
+            generateResponse("help");
+        }
+
+        // Initialize the beacon system when page loads
+        window.onload = initBeaconSystem;
     </script>
 </body>
 </html>
