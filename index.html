@@ -21,6 +21,7 @@
             background-image: radial-gradient(circle at 10% 20%, rgba(11, 61, 145, 0.2) 0%, transparent 20%), 
                               radial-gradient(circle at 90% 80%, rgba(252, 61, 33, 0.2) 0%, transparent 20%);
             min-height: 100vh;
+            transition: background 0.5s;
         }
         .container {
             max-width: 1200px;
@@ -295,13 +296,42 @@
         .theme-4 { background: linear-gradient(135deg, #8b0000, #000000); }
         .theme-5 { background: linear-gradient(135deg, #ff8c00, #000000); }
         .theme-6 { background: linear-gradient(135deg, #9400d3, #000000); }
-        footer {
-            text-align: center;
-            margin-top: 50px;
-            padding: 20px 0;
-            border-top: 1px solid rgba(230, 247, 255, 0.1);
-            font-size: 14px;
-            opacity: 0.7;
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(26, 26, 46, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .overlay.active {
+            display: flex;
+        }
+        .overlay-content {
+            background: #23234a;
+            color: var(--light);
+            padding: 32px 32px 24px 32px;
+            border-radius: 12px;
+            min-width: 320px;
+            max-width: 90vw;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+            position: relative;
+        }
+        .close-overlay {
+            position: absolute;
+            top: 10px;
+            right: 18px;
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .tone-indicator {
+            font-size: 13px;
+            color: var(--accent);
+            margin-top: 8px;
         }
         @media (max-width: 768px) {
             .chat-container {
@@ -371,12 +401,12 @@
             <div class="sidebar">
                 <div class="sidebar-section">
                     <h3>AI Persona</h3>
-                    <div class="mode-selector">
-                        <button class="mode-btn active">Default (Scientific)</button>
-                        <button class="mode-btn">Carl Sagan</button>
-                        <button class="mode-btn">Neil deGrasse Tyson</button>
-                        <button class="mode-btn">Elon Musk</button>
-                        <button class="mode-btn">Custom...</button>
+                    <div class="mode-selector" id="persona-selector">
+                        <button class="mode-btn active" data-persona="Default (Scientific)">Default (Scientific)</button>
+                        <button class="mode-btn" data-persona="Carl Sagan">Carl Sagan</button>
+                        <button class="mode-btn" data-persona="Neil deGrasse Tyson">Neil deGrasse Tyson</button>
+                        <button class="mode-btn" data-persona="Elon Musk">Elon Musk</button>
+                        <button class="mode-btn" data-persona="Custom...">Custom...</button>
                     </div>
                 </div>
                 <div class="sidebar-section">
@@ -389,38 +419,41 @@
                         <label for="technicality">Technical Depth</label>
                         <input type="range" min="0" max="100" value="80" class="slider" id="technicality">
                     </div>
+                    <div class="tone-indicator" id="tone-indicator">
+                        Formality: 70 | Technical Depth: 80
+                    </div>
                 </div>
                 <div class="sidebar-section">
                     <h3>Space Exploration Tools</h3>
-                    <div class="mode-selector">
-                        <button class="mode-btn">Orbit Calculator</button>
-                        <button class="mode-btn">Fuel Estimation</button>
-                        <button class="mode-btn">Signal Delay</button>
-                        <button class="mode-btn">Habitat Design</button>
-                        <button class="mode-btn">Mission Planner</button>
+                    <div class="mode-selector" id="tools-selector">
+                        <button class="mode-btn" data-tool="Orbit Calculator">Orbit Calculator</button>
+                        <button class="mode-btn" data-tool="Fuel Estimation">Fuel Estimation</button>
+                        <button class="mode-btn" data-tool="Signal Delay">Signal Delay</button>
+                        <button class="mode-btn" data-tool="Habitat Design">Habitat Design</button>
+                        <button class="mode-btn" data-tool="Mission Planner">Mission Planner</button>
                     </div>
                 </div>
                 <div class="sidebar-section">
                     <h3>Quick Actions</h3>
-                    <button class="mode-btn">Create Study Notes</button>
-                    <button class="mode-btn">Generate Report</button>
-                    <button class="mode-btn">Analyze Data</button>
-                    <button class="mode-btn">Mental Health Check</button>
+                    <button class="mode-btn" data-action="Create Study Notes">Create Study Notes</button>
+                    <button class="mode-btn" data-action="Generate Report">Generate Report</button>
+                    <button class="mode-btn" data-action="Analyze Data">Analyze Data</button>
+                    <button class="mode-btn" data-action="Mental Health Check">Mental Health Check</button>
                 </div>
             </div>
             <div class="chat-area">
-                <div class="chat-messages">
+                <div class="chat-messages" id="chat-messages">
                     <div class="message">
                         <div class="message-user">Space Specialist:</div>
-                        <div class="message-ai">Welcome, Space Exploration Specialist. I'm StellarMind AI, your advanced assistant for all space-related research, calculations, and mission planning. How can I assist with your cosmic endeavors today?</div>
+                        <div class="message-ai">Welcome, Space Exploration Specialist. I'm <span id="persona-label">StellarMind AI</span>, your advanced assistant for all space-related research, calculations, and mission planning. How can I assist with your cosmic endeavors today?</div>
                     </div>
                 </div>
                 <div class="input-area">
                     <div class="input-row">
-                        <textarea class="text-input" placeholder="Type your message..."></textarea>
+                        <textarea class="text-input" placeholder="Type your message..." id="chat-input"></textarea>
                         <input type="file" class="file-upload" id="file-upload">
-                        <label for="file-upload" class="upload-btn">Upload</label>
-                        <button class="send-btn">Send</button>
+                        <label for="file-upload" class="upload-btn" id="upload-label">Upload</label>
+                        <button class="send-btn" id="send-btn">Send</button>
                     </div>
                 </div>
             </div>
@@ -451,5 +484,257 @@
             &copy; 2025 StellarMind AI. All rights reserved.
         </footer>
     </div>
+    <!-- Overlay for tools -->
+    <div class="overlay" id="tool-overlay">
+        <div class="overlay-content" id="overlay-content">
+            <button class="close-overlay" id="close-overlay">&times;</button>
+            <div id="tool-content"></div>
+        </div>
+    </div>
+    <script>
+        // Theme switching
+        const themeBtns = document.querySelectorAll('.theme-btn');
+        themeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                themeBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const theme = btn.dataset.theme;
+                switch(theme) {
+                    case "1":
+                        document.body.style.backgroundColor = "#1a1a2e";
+                        document.body.style.backgroundImage = "radial-gradient(circle at 10% 20%, rgba(11, 61, 145, 0.2) 0%, transparent 20%), radial-gradient(circle at 90% 80%, rgba(252, 61, 33, 0.2) 0%, transparent 20%)";
+                        break;
+                    case "2":
+                        document.body.style.backgroundColor = "#000000";
+                        document.body.style.backgroundImage = "linear-gradient(135deg, #4b0082, #000000)";
+                        break;
+                    case "3":
+                        document.body.style.backgroundColor = "#000000";
+                        document.body.style.backgroundImage = "linear-gradient(135deg, #006400, #000000)";
+                        break;
+                    case "4":
+                        document.body.style.backgroundColor = "#000000";
+                        document.body.style.backgroundImage = "linear-gradient(135deg, #8b0000, #000000)";
+                        break;
+                    case "5":
+                        document.body.style.backgroundColor = "#000000";
+                        document.body.style.backgroundImage = "linear-gradient(135deg, #ff8c00, #000000)";
+                        break;
+                    case "6":
+                        document.body.style.backgroundColor = "#000000";
+                        document.body.style.backgroundImage = "linear-gradient(135deg, #9400d3, #000000)";
+                        break;
+                }
+            });
+        });
+
+        // Persona switching
+        const personaBtns = document.querySelectorAll('#persona-selector .mode-btn');
+        let currentPersona = "Default (Scientific)";
+        personaBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                personaBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentPersona = btn.dataset.persona;
+                document.getElementById('persona-label').textContent = currentPersona === "Default (Scientific)" ? "StellarMind AI" : currentPersona;
+                // Add a message to chat
+                addAIMessage(`Persona switched to <b>${currentPersona}</b>.`, true);
+            });
+        });
+
+        // Tone adjustment
+        const formalitySlider = document.getElementById('formality');
+        const technicalitySlider = document.getElementById('technicality');
+        const toneIndicator = document.getElementById('tone-indicator');
+        function updateToneIndicator() {
+            toneIndicator.textContent = `Formality: ${formalitySlider.value} | Technical Depth: ${technicalitySlider.value}`;
+        }
+        formalitySlider.addEventListener('input', updateToneIndicator);
+        technicalitySlider.addEventListener('input', updateToneIndicator);
+
+        // Tool overlays
+        const toolsSelector = document.getElementById('tools-selector');
+        const overlay = document.getElementById('tool-overlay');
+        const overlayContent = document.getElementById('tool-content');
+        const closeOverlay = document.getElementById('close-overlay');
+        toolsSelector.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tool = btn.dataset.tool;
+                showToolOverlay(tool);
+            });
+        });
+        closeOverlay.addEventListener('click', () => {
+            overlay.classList.remove('active');
+        });
+        function showToolOverlay(tool) {
+            let html = '';
+            switch(tool) {
+                case "Orbit Calculator":
+                    html = `<h2>Orbit Calculator</h2>
+                            <p>Enter parameters to compute orbital elements:</p>
+                            <label>Semi-major axis (km): <input type="number" id="orbit-a" value="7000"></label><br>
+                            <label>Eccentricity: <input type="number" step="0.01" id="orbit-e" value="0.01"></label><br>
+                            <button onclick="computeOrbit()">Compute</button>
+                            <div id="orbit-result" style="margin-top:10px;"></div>
+                            <script>
+                            function computeOrbit() {
+                                var a = document.getElementById('orbit-a').value;
+                                var e = document.getElementById('orbit-e').value;
+                                var periapsis = a * (1 - e);
+                                var apoapsis = a * (1 + e);
+                                document.getElementById('orbit-result').innerHTML = 
+                                    'Periapsis: ' + periapsis.toFixed(2) + ' km<br>Apoapsis: ' + apoapsis.toFixed(2) + ' km';
+                            }
+                            </script>`;
+                    break;
+                case "Fuel Estimation":
+                    html = `<h2>Fuel Estimation</h2>
+                            <p>Estimate fuel for a mission:</p>
+                            <label>Delta-v (m/s): <input type="number" id="fuel-dv" value="9500"></label><br>
+                            <label>Exhaust velocity (m/s): <input type="number" id="fuel-ve" value="4500"></label><br>
+                            <label>Payload mass (kg): <input type="number" id="fuel-m0" value="1000"></label><br>
+                            <button onclick="computeFuel()">Estimate</button>
+                            <div id="fuel-result" style="margin-top:10px;"></div>
+                            <script>
+                            function computeFuel() {
+                                var dv = document.getElementById('fuel-dv').value;
+                                var ve = document.getElementById('fuel-ve').value;
+                                var m0 = document.getElementById('fuel-m0').value;
+                                var mf = m0 / Math.exp(dv/ve);
+                                var fuel = m0 - mf;
+                                document.getElementById('fuel-result').innerHTML = 
+                                    'Fuel required: ' + fuel.toFixed(2) + ' kg';
+                            }
+                            </script>`;
+                    break;
+                case "Signal Delay":
+                    html = `<h2>Signal Delay</h2>
+                            <p>Calculate signal delay (one-way):</p>
+                            <label>Distance (km): <input type="number" id="delay-dist" value="384400"></label>
+                            <button onclick="computeDelay()">Calculate</button>
+                            <div id="delay-result" style="margin-top:10px;"></div>
+                            <script>
+                            function computeDelay() {
+                                var d = document.getElementById('delay-dist').value;
+                                var delay = d * 1000 / 299792458;
+                                document.getElementById('delay-result').innerHTML = 
+                                    'Delay: ' + delay.toFixed(2) + ' seconds';
+                            }
+                            </script>`;
+                    break;
+                case "Habitat Design":
+                    html = `<h2>Habitat Design</h2>
+                            <p>Model parameters for habitat:</p>
+                            <label>Crew size: <input type="number" id="hab-crew" value="6"></label><br>
+                            <label>Duration (days): <input type="number" id="hab-days" value="180"></label><br>
+                            <button onclick="computeHabitat()">Estimate</button>
+                            <div id="hab-result" style="margin-top:10px;"></div>
+                            <script>
+                            function computeHabitat() {
+                                var crew = document.getElementById('hab-crew').value;
+                                var days = document.getElementById('hab-days').value;
+                                var water = crew * days * 3; // 3L per day
+                                var food = crew * days * 0.8; // 0.8kg per day
+                                document.getElementById('hab-result').innerHTML = 
+                                    'Water needed: ' + water + ' L<br>Food needed: ' + food + ' kg';
+                            }
+                            </script>`;
+                    break;
+                case "Mission Planner":
+                    html = `<h2>Mission Planner</h2>
+                            <p>Schedule mission phases and logistics.</p>
+                            <ul>
+                                <li>Phase 1: Launch Preparation</li>
+                                <li>Phase 2: Transit</li>
+                                <li>Phase 3: Arrival & Operations</li>
+                                <li>Phase 4: Return</li>
+                            </ul>
+                            <p><i>This is a mockup. Integrate your backend for full planning features.</i></p>`;
+                    break;
+            }
+            overlayContent.innerHTML = html;
+            overlay.classList.add('active');
+        }
+        // Allow overlay tools to work (since innerHTML wipes listeners, use eval for demo)
+        const observer = new MutationObserver(() => {
+            const scripts = overlayContent.querySelectorAll('script');
+            scripts.forEach(script => eval(script.innerHTML));
+        });
+        observer.observe(overlayContent, { childList: true });
+
+        // Quick Actions
+        document.querySelectorAll('[data-action]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.dataset.action;
+                let aiReply = '';
+                switch(action) {
+                    case "Create Study Notes":
+                        aiReply = "Here are your study notes on orbital mechanics:<br>- Kepler's Laws<br>- Hohmann Transfer<br>- Delta-v budgeting<br>...and more.";
+                        break;
+                    case "Generate Report":
+                        aiReply = "Mission report generated. Summary: All systems nominal, trajectory optimal, risks minimal.";
+                        break;
+                    case "Analyze Data":
+                        aiReply = "Data analyzed: No anomalies detected. Signal-to-noise ratio within expected parameters.";
+                        break;
+                    case "Mental Health Check":
+                        aiReply = "Mental health check: All crew members report positive mood and no signs of stress.";
+                        break;
+                }
+                addAIMessage(aiReply, false);
+            });
+        });
+
+        // Chat send
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const chatMessages = document.getElementById('chat-messages');
+        function addUserMessage(text) {
+            const msg = document.createElement('div');
+            msg.className = 'message';
+            msg.innerHTML = `<div class="message-user">User:</div><div>${text}</div>`;
+            chatMessages.appendChild(msg);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        function addAIMessage(text, personaSwitch=false) {
+            const msg = document.createElement('div');
+            msg.className = 'message';
+            msg.innerHTML = `<div class="message-user">${currentPersona}:</div><div class="message-ai${personaSwitch ? ' persona' : ''}">${text}</div>`;
+            chatMessages.appendChild(msg);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        sendBtn.addEventListener('click', () => {
+            const text = chatInput.value.trim();
+            if (!text) return;
+            addUserMessage(text);
+            chatInput.value = '';
+            setTimeout(() => {
+                addAIMessage("Received: " + text, false);
+            }, 500);
+        });
+        chatInput.addEventListener('keydown', e => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                sendBtn.click();
+            }
+        });
+
+        // File upload
+        const fileUpload = document.getElementById('file-upload');
+        const uploadLabel = document.getElementById('upload-label');
+        fileUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            addUserMessage(`Uploaded file: <b>${file.name}</b>`);
+            setTimeout(() => {
+                addAIMessage(`File <b>${file.name}</b> received and ready for analysis.`, false);
+            }, 500);
+        });
+
+        // For accessibility: close overlay with Esc
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") overlay.classList.remove('active');
+        });
+    </script>
 </body>
 </html>
