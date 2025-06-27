@@ -612,7 +612,6 @@
             }
             overlayContent.innerHTML = html;
             overlay.classList.add('active');
-            // Tool logic
             setTimeout(() => {
                 if (tool === "Orbit Calculator") {
                     document.getElementById('orbit-calc-btn').onclick = function() {
@@ -655,9 +654,8 @@
                 }
             }, 100);
         }
-        // Close overlay with Esc
         document.addEventListener('keydown', (e) => {
-            if (e.key === "Escape") overlay.classList.remove('active');
+            if (e.key === "Escape") document.getElementById('tool-overlay').classList.remove('active');
         });
         // Quick Actions
         document.querySelectorAll('[data-action]').forEach(btn => {
