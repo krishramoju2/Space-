@@ -537,7 +537,6 @@
                 btn.classList.add('active');
                 currentPersona = btn.dataset.persona;
                 document.getElementById('persona-label').textContent = currentPersona === "Default (Scientific)" ? "StellarMind AI" : currentPersona;
-                // Add a message to chat
                 addAIMessage(`Persona switched to <b>${currentPersona}</b>.`, true);
             });
         });
@@ -568,100 +567,98 @@
         });
         function showToolOverlay(tool) {
             let html = '';
-            switch(tool) {
-                case "Orbit Calculator":
-                    html = `<h2>Orbit Calculator</h2>
-                            <p>Enter parameters to compute orbital elements:</p>
-                            <label>Semi-major axis (km): <input type="number" id="orbit-a" value="7000"></label><br>
-                            <label>Eccentricity: <input type="number" step="0.01" id="orbit-e" value="0.01"></label><br>
-                            <button onclick="computeOrbit()">Compute</button>
-                            <div id="orbit-result" style="margin-top:10px;"></div>
-                            <script>
-                            function computeOrbit() {
-                                var a = document.getElementById('orbit-a').value;
-                                var e = document.getElementById('orbit-e').value;
-                                var periapsis = a * (1 - e);
-                                var apoapsis = a * (1 + e);
-                                document.getElementById('orbit-result').innerHTML = 
-                                    'Periapsis: ' + periapsis.toFixed(2) + ' km<br>Apoapsis: ' + apoapsis.toFixed(2) + ' km';
-                            }
-                            </script>`;
-                    break;
-                case "Fuel Estimation":
-                    html = `<h2>Fuel Estimation</h2>
-                            <p>Estimate fuel for a mission:</p>
-                            <label>Delta-v (m/s): <input type="number" id="fuel-dv" value="9500"></label><br>
-                            <label>Exhaust velocity (m/s): <input type="number" id="fuel-ve" value="4500"></label><br>
-                            <label>Payload mass (kg): <input type="number" id="fuel-m0" value="1000"></label><br>
-                            <button onclick="computeFuel()">Estimate</button>
-                            <div id="fuel-result" style="margin-top:10px;"></div>
-                            <script>
-                            function computeFuel() {
-                                var dv = document.getElementById('fuel-dv').value;
-                                var ve = document.getElementById('fuel-ve').value;
-                                var m0 = document.getElementById('fuel-m0').value;
-                                var mf = m0 / Math.exp(dv/ve);
-                                var fuel = m0 - mf;
-                                document.getElementById('fuel-result').innerHTML = 
-                                    'Fuel required: ' + fuel.toFixed(2) + ' kg';
-                            }
-                            </script>`;
-                    break;
-                case "Signal Delay":
-                    html = `<h2>Signal Delay</h2>
-                            <p>Calculate signal delay (one-way):</p>
-                            <label>Distance (km): <input type="number" id="delay-dist" value="384400"></label>
-                            <button onclick="computeDelay()">Calculate</button>
-                            <div id="delay-result" style="margin-top:10px;"></div>
-                            <script>
-                            function computeDelay() {
-                                var d = document.getElementById('delay-dist').value;
-                                var delay = d * 1000 / 299792458;
-                                document.getElementById('delay-result').innerHTML = 
-                                    'Delay: ' + delay.toFixed(2) + ' seconds';
-                            }
-                            </script>`;
-                    break;
-                case "Habitat Design":
-                    html = `<h2>Habitat Design</h2>
-                            <p>Model parameters for habitat:</p>
-                            <label>Crew size: <input type="number" id="hab-crew" value="6"></label><br>
-                            <label>Duration (days): <input type="number" id="hab-days" value="180"></label><br>
-                            <button onclick="computeHabitat()">Estimate</button>
-                            <div id="hab-result" style="margin-top:10px;"></div>
-                            <script>
-                            function computeHabitat() {
-                                var crew = document.getElementById('hab-crew').value;
-                                var days = document.getElementById('hab-days').value;
-                                var water = crew * days * 3; // 3L per day
-                                var food = crew * days * 0.8; // 0.8kg per day
-                                document.getElementById('hab-result').innerHTML = 
-                                    'Water needed: ' + water + ' L<br>Food needed: ' + food + ' kg';
-                            }
-                            </script>`;
-                    break;
-                case "Mission Planner":
-                    html = `<h2>Mission Planner</h2>
-                            <p>Schedule mission phases and logistics.</p>
-                            <ul>
-                                <li>Phase 1: Launch Preparation</li>
-                                <li>Phase 2: Transit</li>
-                                <li>Phase 3: Arrival & Operations</li>
-                                <li>Phase 4: Return</li>
-                            </ul>
-                            <p><i>This is a mockup. Integrate your backend for full planning features.</i></p>`;
-                    break;
+            if (tool === "Orbit Calculator") {
+                html = `<h2>Orbit Calculator</h2>
+                    <p>Enter parameters to compute orbital elements:</p>
+                    <label>Semi-major axis (km): <input type="number" id="orbit-a" value="7000"></label><br>
+                    <label>Eccentricity: <input type="number" step="0.01" id="orbit-e" value="0.01"></label><br>
+                    <button id="orbit-calc-btn">Compute</button>
+                    <div id="orbit-result" style="margin-top:10px;"></div>`;
+            }
+            if (tool === "Fuel Estimation") {
+                html = `<h2>Fuel Estimation</h2>
+                    <p>Estimate fuel for a mission:</p>
+                    <label>Delta-v (m/s): <input type="number" id="fuel-dv" value="9500"></label><br>
+                    <label>Exhaust velocity (m/s): <input type="number" id="fuel-ve" value="4500"></label><br>
+                    <label>Payload mass (kg): <input type="number" id="fuel-m0" value="1000"></label><br>
+                    <button id="fuel-calc-btn">Estimate</button>
+                    <div id="fuel-result" style="margin-top:10px;"></div>`;
+            }
+            if (tool === "Signal Delay") {
+                html = `<h2>Signal Delay</h2>
+                    <p>Calculate signal delay (one-way):</p>
+                    <label>Distance (km): <input type="number" id="delay-dist" value="384400"></label>
+                    <button id="delay-calc-btn">Calculate</button>
+                    <div id="delay-result" style="margin-top:10px;"></div>`;
+            }
+            if (tool === "Habitat Design") {
+                html = `<h2>Habitat Design</h2>
+                    <p>Model parameters for habitat:</p>
+                    <label>Crew size: <input type="number" id="hab-crew" value="6"></label><br>
+                    <label>Duration (days): <input type="number" id="hab-days" value="180"></label><br>
+                    <button id="hab-calc-btn">Estimate</button>
+                    <div id="hab-result" style="margin-top:10px;"></div>`;
+            }
+            if (tool === "Mission Planner") {
+                html = `<h2>Mission Planner</h2>
+                    <p>Schedule mission phases and logistics.</p>
+                    <ul>
+                        <li>Phase 1: Launch Preparation</li>
+                        <li>Phase 2: Transit</li>
+                        <li>Phase 3: Arrival & Operations</li>
+                        <li>Phase 4: Return</li>
+                    </ul>
+                    <p><i>This is a mockup. Integrate your backend for full planning features.</i></p>`;
             }
             overlayContent.innerHTML = html;
             overlay.classList.add('active');
+            // Tool logic
+            setTimeout(() => {
+                if (tool === "Orbit Calculator") {
+                    document.getElementById('orbit-calc-btn').onclick = function() {
+                        var a = Number(document.getElementById('orbit-a').value);
+                        var e = Number(document.getElementById('orbit-e').value);
+                        var periapsis = a * (1 - e);
+                        var apoapsis = a * (1 + e);
+                        document.getElementById('orbit-result').innerHTML =
+                            'Periapsis: ' + periapsis.toFixed(2) + ' km<br>Apoapsis: ' + apoapsis.toFixed(2) + ' km';
+                    }
+                }
+                if (tool === "Fuel Estimation") {
+                    document.getElementById('fuel-calc-btn').onclick = function() {
+                        var dv = Number(document.getElementById('fuel-dv').value);
+                        var ve = Number(document.getElementById('fuel-ve').value);
+                        var m0 = Number(document.getElementById('fuel-m0').value);
+                        var mf = m0 / Math.exp(dv/ve);
+                        var fuel = m0 - mf;
+                        document.getElementById('fuel-result').innerHTML =
+                            'Fuel required: ' + fuel.toFixed(2) + ' kg';
+                    }
+                }
+                if (tool === "Signal Delay") {
+                    document.getElementById('delay-calc-btn').onclick = function() {
+                        var d = Number(document.getElementById('delay-dist').value);
+                        var delay = d * 1000 / 299792458;
+                        document.getElementById('delay-result').innerHTML =
+                            'Delay: ' + delay.toFixed(2) + ' seconds';
+                    }
+                }
+                if (tool === "Habitat Design") {
+                    document.getElementById('hab-calc-btn').onclick = function() {
+                        var crew = Number(document.getElementById('hab-crew').value);
+                        var days = Number(document.getElementById('hab-days').value);
+                        var water = crew * days * 3; // 3L per day
+                        var food = crew * days * 0.8; // 0.8kg per day
+                        document.getElementById('hab-result').innerHTML =
+                            'Water needed: ' + water + ' L<br>Food needed: ' + food + ' kg';
+                    }
+                }
+            }, 100);
         }
-        // Allow overlay tools to work (since innerHTML wipes listeners, use eval for demo)
-        const observer = new MutationObserver(() => {
-            const scripts = overlayContent.querySelectorAll('script');
-            scripts.forEach(script => eval(script.innerHTML));
+        // Close overlay with Esc
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") overlay.classList.remove('active');
         });
-        observer.observe(overlayContent, { childList: true });
-
         // Quick Actions
         document.querySelectorAll('[data-action]').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -684,7 +681,6 @@
                 addAIMessage(aiReply, false);
             });
         });
-
         // Chat send
         const chatInput = document.getElementById('chat-input');
         const sendBtn = document.getElementById('send-btn');
@@ -718,10 +714,8 @@
                 sendBtn.click();
             }
         });
-
         // File upload
         const fileUpload = document.getElementById('file-upload');
-        const uploadLabel = document.getElementById('upload-label');
         fileUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -729,11 +723,6 @@
             setTimeout(() => {
                 addAIMessage(`File <b>${file.name}</b> received and ready for analysis.`, false);
             }, 500);
-        });
-
-        // For accessibility: close overlay with Esc
-        document.addEventListener('keydown', (e) => {
-            if (e.key === "Escape") overlay.classList.remove('active');
         });
     </script>
 </body>
